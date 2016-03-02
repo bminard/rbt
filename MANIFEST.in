@@ -1,0 +1,5 @@
+recursive-include rbtlib *.py 
+recursive-include scripts *.py rbt
+include README.rst
+include LICENSE
+include CHANGES
