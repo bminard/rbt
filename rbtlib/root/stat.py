@@ -24,14 +24,23 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
+from functools import wraps
 import resource
 
 
 def key(get):
     """ Check response status from Review Board instance.
     """
-    def _stat_decorator(url):
-        response = get(url)
-        assert 'ok' == response['stat'] or 'fail' == response['stat']
+    @wraps(get)
+    def _stat_decorator(url, query_dict = None):
+        """ Check the stat returned by the Review Board instance.
+
+        URL is the fully qualified domain name, including the scheme, of the Review Board
+        instance to query.
+
+        query_dict are parameters passed with the URL.
+        """
+        response = get(url, query_dict)
+        assert 'ok' == response.stat or 'fail' == response.stat
         return response
     return _stat_decorator

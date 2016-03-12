@@ -24,19 +24,26 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
+import rbtlib.composite
 import resource
 import stat
 
 
 @stat.key
-def get(url):
+@rbtlib.composite.construct('Root')
+def get(url, query_dict = None):
     """ Return a JSON formated `Root Resource`_ from a Review Board instance.
 
-        _Root Resource: https://www.reviewboard.org/docs/manual/2.5/webapi/2.0/resources/root/#webapi2.0-root-resource/
+    _Root Resource: https://www.reviewboard.org/docs/manual/2.5/webapi/2.0/resources/root/#webapi2.0-root-resource/
+
+    URL is the fully qualified domain name, including the scheme, of the Review Board
+    instance to query.
+
+    query_dict are parameters passed with the URL.
     """
     try:
         # Do not assert root resources here. Instead, assert at the point of use
         # so responses needn't be consistent in all call contexts.
-        return resource.get('application/vnd.reviewboard.org.root+json')(url + '/api/')
+        return resource.get('application/vnd.reviewboard.org.root+json')(url + '/api/', query_dict)
     except:
         raise

@@ -43,29 +43,29 @@ def content_type():
 def test_root_links_key_present(resource, content_type, review_board_url):
     """ Handle case when link resource is present.
     """
-    links.key(resource, content_type)(review_board_url)
+    links.get(resource, content_type)(review_board_url)
 
 
 def test_root_links_key_missing(review_board_url):
     """ Handle case when link resource is unavailable.
     """
     with pytest.raises(links.BadLinkName):
-        links.key('foobar', 'text/html')(review_board_url)
+        links.get('foobar', 'text/html')(review_board_url)
 
 
 def test_get_through_link_without_query_dict(resource, content_type, review_board_url):
     """ Handle case when link resource is present.
     """
-    links.key(resource, content_type)(review_board_url)
+    links.get(resource, content_type)(review_board_url)
 
 
 def test_get_through_link_without_query_dict(resource, content_type, review_board_url):
     """ Handle case when link resource is present.
     """
-    links.key(resource, content_type)(review_board_url, { 'counts-only': 'True' })
+    links.get(resource, content_type)(review_board_url, { 'counts-only': 'True' })
 
 
 def test_get_through_link_without_query_dict(resource, content_type, review_board_url):
     """ Handle case when link resource is present.
     """
-    links.key(resource, content_type)(review_board_url, { 'mycounts-only': 'True' })
+    links.get(resource, content_type)(review_board_url, { 'mycounts-only': 'True' })

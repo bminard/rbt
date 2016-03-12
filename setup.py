@@ -68,12 +68,12 @@ setup(
     author = "Brian Minard",
     author_email = "bminard@flatfoot.ca",
     license = "MIT",
-    description = 'A simple RBTool clone.',
+    description = 'A client-side library for Review Board.',
     long_description = description,
     maintainer = 'Brian Minard',
     url = 'https://github.com/bminard/rbt',
     name = 'rbtlib',
-    version = '0.1',
+    version = '0.2',
     packages = [
         'rbtlib',
     ],
@@ -91,6 +91,7 @@ setup(
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2.7',
+        'Intended Audience :: Developers',
     ],
 
     **extra_args

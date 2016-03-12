@@ -24,8 +24,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
-import requests
+from functools import wraps
 import http
+import requests
 
 
 class BadContentType(Exception):
@@ -41,12 +42,18 @@ class BadContentType(Exception):
 def get(expected_content_type):
     """ Generate a getter for the expected content type.
     """
+    @wraps(get)
     def _get(url, query_dict = None):
         """ Return a JSON formated response.
+
+        URL is the fully qualified domain name, including the scheme, of the Review Board
+        instance to query.
+
+        query_dict are parameters passed with the URL.
     
-            Exceptions:
-            - BadContentType: whenever the expected and actual content type differ
-            - ValueError: whenever the JSON decode fails
+        Exceptions:
+          - BadContentType: whenever the expected and actual content type differ
+          - ValueError: whenever the JSON decode fails
         """
         try:
             response = http.get(url, query_dict)

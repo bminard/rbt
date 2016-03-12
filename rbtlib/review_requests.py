@@ -27,4 +27,4 @@
 import root
 
 
-get = root.links.key('review_requests', 'application/vnd.reviewboard.org.review-requests+json')
+get = root.links.get('review_requests', 'application/vnd.reviewboard.org.review-requests+json')

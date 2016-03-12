@@ -32,7 +32,7 @@ import root
 def test_root_get_ok(review_board_url):
     """ Expected status of a successful request.
     """
-    assert 'ok' == root.get(review_board_url)['stat']
+    assert 'ok' == root.get(review_board_url).stat
 
 
 def test_root_get_bad_request():

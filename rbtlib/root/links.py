@@ -24,8 +24,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
+from functools import wraps
+import rbtlib.composite
 import resource
 import root
+import stat
 
 
 class BadLinkName(Exception):
@@ -36,7 +39,7 @@ class BadLinkName(Exception):
         self._link_name = link_name
 
 
-def key(link_name, content_type):
+def get(link_name, content_type):
     """ Generate a getter to obtain a linked resource.
 
         Preconditions:
@@ -45,14 +48,27 @@ def key(link_name, content_type):
         Exceptions:
         - BadLinkName: link_name is not in the Root Resource's links dictionary
     """
+    @stat.key
+    @rbtlib.composite.construct(link_name)
+    @wraps(get)
     def _get(url, query_dict = None):
+        """ Return a JSON formated resource linked to the `Root Resource`_
+
+        URL is the fully qualified domain name, including the scheme, of the Review Board
+        instance to query.
+
+        query_dict are parameters passed with the URL.
+
+        _Root Resource: https://www.reviewboard.org/docs/manual/2.5/webapi/2.0/resources/root/#webapi2.0-root-resource/
+        """
         try:
             response = root.get(url)
-            assert 'links' in response, "root resource missing links key!"
-            if link_name in response['links']:
-                assert 'href' in response['links'][link_name], "missing href key!"
-                assert 'method' in response['links'][link_name] and 'GET' == response['links'][link_name]['method'], "missing method key!"
-                return resource.get(content_type)(response['links'][link_name]['href'], query_dict)
+            assert response.links, "root resource missing links key!"
+            try:
+                assert 'GET' == getattr(response.links, link_name).method, "expecting HTTP GET method!"
+                return resource.get(content_type)(getattr(response.links, link_name).href, query_dict)
+            except AttributeError:
+                raise BadLinkName(url, link_name)
             raise BadLinkName(url, link_name)
         except:
             raise
