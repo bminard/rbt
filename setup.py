@@ -73,7 +73,7 @@ setup(
     maintainer = 'Brian Minard',
     url = 'https://github.com/bminard/rbt',
     name = 'rbtlib',
-    version = '0.2',
+    version = '0.3',
     packages = [
         'rbtlib',
     ],

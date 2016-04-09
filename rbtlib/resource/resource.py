@@ -1,21 +1,21 @@
 #-------------------------------------------------------------------------------
 # rbt: resource.py
 #
-# Get a JSON formated response from a URL.
+# Get a named tuple response from a URL.
 #-------------------------------------------------------------------------------
 # The MIT License (MIT)
 # Copyright (c) 2016 Brian Minard
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
 # to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense,
 # and/or sell copies of the Software, and to permit persons to whom the
 # Software is furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 # OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -24,45 +24,38 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
-from functools import wraps
-import http
-import requests
+from abc import ABCMeta, abstractmethod
+from composite import Composite
+import stat
 
 
-class BadContentType(Exception):
-    """ Exception thrown when expected and actual content types differ.
+class Resource(object):
+    """ Abstract base class for all resources.
     """
-    def __init__(self, url, status, expected, actual):
-        self._url = url
-        self._status_code = status
-        self._expected_content_type = expected
-        self._actual_content_type = actual
-
-
-def get(expected_content_type):
-    """ Generate a getter for the expected content type.
-    """
-    @wraps(get)
-    def _get(url, query_dict = None):
-        """ Return a JSON formated response.
-
-        URL is the fully qualified domain name, including the scheme, of the Review Board
-        instance to query.
-
-        query_dict are parameters passed with the URL.
-    
-        Exceptions:
-          - BadContentType: whenever the expected and actual content type differ
-          - ValueError: whenever the JSON decode fails
+    __metaclass__ = ABCMeta
+    def __init__(self, session, resource_name, content_type):
+        """ Construct the abstract base class.
         """
-        try:
-            response = http.get(url, query_dict)
-            if response.headers['Content-Type'] != expected_content_type:
-                raise BadContentType(url,
-                        response.status_code,
-                        expected_content_type,
-                        response.headers['Content-Type'])
-            return response.json()
-        except ValueError:
-            raise
-    return _get
+        self._resource_name = resource_name
+        self._composite = Composite(session)
+    @stat.is_valid
+    def composite(self, query_dict = None):
+        """ Construct the composite for the resource.
+
+        A JSON component is added to the resource to preserve the server's
+        response.
+        """
+        response = self.fetch(query_dict)
+        return self._composite.component(self._resource_name, response, { 'json': response })
+    @abstractmethod
+    def fetch(self, query_dict = None):
+        """ Different getters are required by Root List Resource and all other resources.
+
+        The Root List Resource obtains its URL from the caller. The other
+        resources obtain their URLs from the Root List Resource.
+        """
+        pass
+    def get(self, query_dict = None):
+        """ Return a composite of an HTTP request.
+        """
+        return self.composite(query_dict)

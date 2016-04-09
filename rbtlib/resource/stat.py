@@ -1,21 +1,21 @@
 #-------------------------------------------------------------------------------
-# rbt: __init__.py
+# rbt: stat.py
 #
-# root module initialization.
+# Validate the stat key returned with a Review Board resource.
 #-------------------------------------------------------------------------------
 # The MIT License (MIT)
 # Copyright (c) 2016 Brian Minard
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
 # to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense,
 # and/or sell copies of the Software, and to permit persons to whom the
 # Software is furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 # OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -24,11 +24,22 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
-__all__ = [
-    "links",
-    "root",
-]
+from functools import wraps
 
 
-from links import *
-from root import *
+def is_valid(fetch):
+    """ Check response status from Review Board instance.
+    """
+    @wraps(fetch)
+    def _is_valid(url, query_dict = None):
+        """ Check the stat returned by the Review Board instance.
+
+        URL is the fully qualified domain name, including the scheme, of the Review Board
+        instance to query.
+
+        query_dict are parameters passed with the URL.
+        """
+        response = fetch(url, query_dict)
+        assert 'ok' == response.stat or 'fail' == response.stat
+        return response
+    return _is_valid

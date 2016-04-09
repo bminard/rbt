@@ -1,21 +1,21 @@
 #-------------------------------------------------------------------------------
-# rbt: http.py
+# rbt: root.py
 #
-# Return the HTTP GET to the caller.
+# Get the Root Resource from a Review Board instance.
 #-------------------------------------------------------------------------------
 # The MIT License (MIT)
 # Copyright (c) 2016 Brian Minard
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
 # to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense,
 # and/or sell copies of the Software, and to permit persons to whom the
 # Software is furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 # OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -24,34 +24,30 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
-import requests
+from resource import Resource
 
 
-class BadRequest(Exception):
-    """ Exception raised whenever get() catches a request HTTPError.
+class Root(Resource):
+    """ The Root List Resource for the Review Board instance.
     """
-    def __init__(self, url, status):
+    name = 'root'
+    content_type = 'application/vnd.reviewboard.org.root+json'
+    def __init__(self, session, url):
+        """ Contruct a Root List Resource.
+        """
+        super(Root, self).__init__(session, self.name, self.content_type)
+        self._session = session
         self._url = url
-        self._status = status
+    def fetch(self, query_dict = None):
+        """ Getter for the Root List Resource.
+        """
+        return self._session.get(self._url, params = query_dict).json()
+    def get(self, query_dict = None):
+        """ Getter for the Root List Resource.
+        """
+        return self.composite(query_dict)
     @property
-    def url(self):
-        return self._url
-    @property
-    def status(self):
-        return self._status
-
-
-def get(url, query_dict = None):
-    """ Return the response of the HTTP GET to the caller.
-
-        Exceptions:
-        - BadRequest: whenever request.exceptions.HTTPError is raised
-    """
-    try:
-        response = requests.get(url, params = query_dict)
-        response.raise_for_status()
-        return response
-    except requests.exceptions.HTTPError:
-        raise BadRequest(url, response.status_code)
-    except requests.exceptions.ConnectionError:
-        raise BadRequest(url, "bad url")
+    def session(self):
+        """ Return the HTTP session.
+        """
+        return self._session

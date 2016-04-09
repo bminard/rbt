@@ -25,8 +25,12 @@
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
 __all__ = [
-    "root",
+    "Links",
+    "Resource",
+    "Root",
 ]
 
 
-import root
+from links import Links
+from root import Root
+from root import Resource

@@ -24,18 +24,18 @@
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
 check:
-	make -C root check
+	make -C resource check
 	py.test
 
 
 clean:
-	make -C root clean
+	make -C resource clean
 	-/bin/rm -fr *.pyc __pycache__
 
 
 install:
-	make -C root install
+	make -C resource install
 
 
 uninstall: clean
-	make -C root uninstall
+	make -C resource uninstall

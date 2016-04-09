@@ -26,8 +26,9 @@
 #-------------------------------------------------------------------------------
 import click
 import json
-import review_requests as review_requests_resource
-import root as root_resource
+import requests
+from review_requests import ReviewRequests
+from root import Root
 import sys
 from urlparse import urlparse
 
@@ -41,10 +42,10 @@ def canonify_url(url):
     return url
 
 
-def beautify(response):
+def beautify(resource, query_dict = None):
     """ Beautify response.
     """
-    return json.dumps(response, sort_keys = True, indent = 2)
+    return json.dumps(resource.get(query_dict).json, sort_keys = True, indent = 2)
 
 
 def url_argument(f):
@@ -56,16 +57,20 @@ def url_argument(f):
 
 
 @click.group()
-def rbt():
-    pass
+@click.pass_context
+def rbt(ctx):
+    """ Declare the command group.
+    """
+    ctx.obj['session'] = requests.Session()
 
 
 @rbt.command()
 @url_argument
-def root(url):
+@click.pass_context
+def root(ctx, url):
     """ Show root resource.
     """
-    print beautify(root_resource.get(url))
+    print beautify(Root(ctx.obj['session'], url))
     sys.exit
 
 
@@ -77,7 +82,8 @@ def root(url):
 @click.option('--time-added-to',
     help='The latest date/time the review request is added.')
 @url_argument
-def review_requests(url, counts_only, time_added_from, time_added_to):
+@click.pass_context
+def review_requests(ctx, url, counts_only, time_added_from, time_added_to):
     """ Show review requests resource.
 
     The date and time format is YYYY-MM-DD HH:MM:SS or
@@ -91,5 +97,5 @@ def review_requests(url, counts_only, time_added_from, time_added_to):
         query_dict['time-added-from'] = time_added_from
     if time_added_to:
         query_dict['time-added-to'] = time_added_to
-    print beautify(review_requests_resource.get(url, query_dict))
+    print beautify(ReviewRequests(Root(ctx.obj['session'], url)), query_dict)
     sys.exit

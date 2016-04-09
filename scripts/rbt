@@ -32,4 +32,4 @@ from rbtlib.rbt import rbt
 
 
 if __name__ == '__main__':
-    sys.exit(rbt(sys.argv[1:]))
+    sys.exit(rbt(sys.argv[1:], obj = {}))
