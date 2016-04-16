@@ -84,6 +84,8 @@ setup(
     extras_require = {
         'test': [
             'pytest',
+            'radon',
+            'xenon',
         ],
     },
     platforms = 'Cross Platform',

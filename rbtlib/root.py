@@ -37,7 +37,7 @@ class Root(Resource):
         """
         super(Root, self).__init__(session, self.name, self.content_type)
         self._session = session
-        self._url = url
+        self._url = url + '/api/'
     def fetch(self, query_dict = None):
         """ Getter for the Root List Resource.
         """
