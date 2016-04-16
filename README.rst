@@ -5,7 +5,7 @@ Introduction: what is rbt?
 for Review Board.
 
 Use **rbt** to collect the Root Resource, Review Requests. Limit review
-request using a few parameters.
+request using a few parameters. And post reviews.
 
 Pre-requisites
 --------------
@@ -51,9 +51,19 @@ to get a count of reviews. Or::
 
 to get a list of reviews from the specified date.
 
+Post a review::
+
+    > rbt post reviews.reviewboard.org /path/to/patch
+
 Write your own clients using the **rbtlib** APIs.
 
 License
 -------
 
 **rbt** is open-source software. See the ``LICENSE`` file for more details.
+
+Acknowledgements
+----------------
+
+***rbt*** wouldn't exist if it weren't for the Review Board team's Web
+API documentation.  It's well documented.  Thank you!

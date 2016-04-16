@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
-# rbt: test_review_requests.py
+# rbt: test_resource.py
 #
-# Tests for review_requests.py.
+# Tests for resource.py.
 #-------------------------------------------------------------------------------
 # The MIT License (MIT)
 # Copyright (c) 2016 Brian Minard
@@ -25,33 +25,49 @@
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
 import pytest
-from review_requests import ReviewRequests
-from root import Root
 from types import DictType
+from links import Links
+import requests
+from root import Root
+
+
+def pytest_generate_tests(metafunc):
+    if 'resource' in metafunc.fixturenames:
+        metafunc.parametrize("resource", ['root', 'links'], indirect=True)
 
 
 @pytest.fixture
-def review_requests(session, server):
-    """ Construct the Review Requests object.
+def resource(request, session, server):
+    if 'root' == request.param:
+        return Root(session, server.url)
+    if 'links' == request.param:
+        return Links(Root(session, server.url), 'review_requests', 'application/vnd.reviewboard.org.review-requests+json')
+    raise ValueError("invalid internal test config")
+
+
+def test_resource_composite_ok(resource):
+    """ Expected status of a successful request.
     """
-    return ReviewRequests(Root(session, server.url))
+    assert 'ok' == resource.composite().stat
 
 
-getter_query_dicts = [ None, { 'counts-only': 'True' } ]
-
-
-@pytest.mark.parametrize("getter_query_dict", getter_query_dicts)
-def test_review_requests_fetch_ok(getter_query_dict, review_requests):
-    """ Test review requests getter.
+def test_resource_fetch(resource):
+    """ Handle case when link resource is present.
     """
-    assert type(review_requests.fetch(getter_query_dict)) == DictType
-    assert review_requests.composite().json == review_requests.composite().links.self.get()
-    assert review_requests.composite().json == review_requests.get().json
+    assert type(resource.fetch()) == DictType
 
 
-@pytest.mark.parametrize("getter_query_dict", getter_query_dicts)
-def test_review_requests_composite_ok(getter_query_dict, review_requests, root):
-    """ Test review requests getter.
+def test_resource_get_ok(resource):
+    """ Expected status of a successful request.
     """
-    assert review_requests.composite().links.self.get(getter_query_dict) == review_requests.fetch(getter_query_dict)
-    assert root.composite().links.review_requests.get(getter_query_dict) == review_requests.fetch(getter_query_dict)
+    assert 'ok' == resource.get().stat
+
+
+query_dicts = [ None, { 'counts-only': 'True' } ]
+
+
+@pytest.mark.parametrize("query_dict", query_dicts)
+def test_resource_fetch_matches_get_json(resource, query_dict):
+    """ Expected type of a successful request.
+    """
+    assert resource.fetch(query_dict) == resource.get(query_dict).json

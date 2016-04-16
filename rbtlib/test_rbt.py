@@ -25,44 +25,86 @@
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
 from click.testing import CliRunner
+import collections
 import pytest
 import rbt
+import requests
 
 
-def test_canonify_url_fixup(review_board_fqdn):
+@pytest.fixture
+def context(session):
+    """ Mock-up of the Click context.
+    """
+    args = dict()
+    obj = dict()
+    obj['session'] = session
+    args['obj'] = obj
+    ctx = collections.namedtuple('ctx', 'obj') # FIXME: ctx is read-only.
+    return ctx(**args)
+
+
+def test_canonify_scheme_with_fixup(context, server):
     """ Ensure that URLs are fixed up when they need to be.
     """
-    assert 'https://' + review_board_fqdn == rbt.canonify_url(review_board_fqdn)
+    assert server.url == rbt.canonify_url(context, server.fqdn)
 
 
-def test_canonify_url_no_fixup(review_board_url):
+def test_canonify_scheme_without_fixup(context, server):
     """ Ensure that URLs are not fixed up when they don't need to be.
     """
-    assert review_board_url == rbt.canonify_url(review_board_url)
+    assert server.url == rbt.canonify_url(context, server.url)
 
 
-def test_rbt_with_url_only(review_board_fqdn):
-    """ Run rbt by specifing only a URL.
+def test_login_ok(context, server, credentials):
+    """ Ensure we can login.
+    """
+    if(False == server.can_authenticate()):
+        pytest.skip("cannot authenticate to server: {}".format(server.fqdn))
+    assert 200 ==  rbt.login(context, server.url, credentials['username'], credentials['password'])
+
+
+def test_login_fail(context, server):
+    """ Ensure we can login.
+    """
+    assert 200 ==  rbt.login(context, server.url, 'username', 'password')
+
+
+def test_rbt_with_fqdn_only(context, server):
+    """ Run rbt by specifing only a fully qualified domain name.
     """
     runner = CliRunner()
-    result = runner.invoke(rbt.rbt, [ review_board_fqdn ])
+    result = runner.invoke(rbt.rbt, args = [ server.fqdn ])
     assert 0 < len(result.output)
     assert 0 != result.exit_code
 
 
-def test_rbt_with_root(review_board_fqdn):
-    """ Run rbt by specifing root and a URL.
+subcommand_list = [
+    [ 'root' ],
+    [ 'review-requests' ],
+    [ 'post', 'foo' ]
+]
+
+
+@pytest.mark.parametrize("subcommand", subcommand_list)
+def test_rbt_with_subcommand_url_correct_position(context, subcommand, server):
+    """ Run rbt by specifing a subcommand and URL in the correct order.
     """
     runner = CliRunner()
-    result = runner.invoke(rbt.rbt, [ 'root', review_board_fqdn ])
+    result = runner.invoke(rbt.rbt, args = [ subcommand[0], server.fqdn ].extend(subcommand[1:]), obj = dict())
     assert 0 < len(result.output)
     assert 0 == result.exit_code
 
 
-def test_rbt_with_root(review_board_fqdn):
-    """ Run rbt by specifing root and a URL.
+@pytest.mark.parametrize("subcommand", subcommand_list)
+def test_rbt_with_subcommand_url_wrong_position(context, subcommand, server):
+    """ Run rbt by specifing a subcommand and URL in the wrong order.
     """
     runner = CliRunner()
-    result = runner.invoke(rbt.rbt, [ review_board_fqdn, 'root' ])
-    assert 0 < len(result.output)
+    if 1 < len(subcommand):
+        args = [ server.fqdn ]
+        args.extend(subcommand[0:])
+    else:
+        args = [ server.fqdn, subcommand ]
+    result = runner.invoke(rbt.rbt, args, obj = dict())
+    assert result.output == 'Usage: rbt [OPTIONS] COMMAND [ARGS]...\n\nError: No such command "{}".\n'.format(server.fqdn)
     assert 0 != result.exit_code

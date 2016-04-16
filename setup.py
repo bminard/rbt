@@ -79,6 +79,7 @@ setup(
     ],
     install_requires = [
         'Click',
+        'python-magic',
         'requests',
     ],
     extras_require = {

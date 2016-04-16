@@ -46,7 +46,7 @@ class Composite(object):
         elif 'GET' == method:
             return lambda query_dict = dict(): self._session.get(href, data = query_dict).json()
         elif 'POST' == method:
-            return lambda post_data_dict = dict(): self._session.post(href, data = post_data_dict).json()
+            return lambda post_data_dict = dict(): self._session.post(href, files = post_data_dict).json()
         elif 'PUT' == method:
             return lambda put_data_dict = dict(): self._session.put(href, data = put_data_dict).json()
         assert 0, "unsupported http method: {}".format(method)

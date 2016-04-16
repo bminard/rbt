@@ -51,16 +51,16 @@ def check_output(*args):
 
 @pytest.mark.parametrize("script", scripts)
 @pytest.mark.parametrize("subcommand", subcommands)
-def test_script_subcommand_no_options(script, subcommand, review_board_url):
+def test_script_subcommand_no_options(script, subcommand, server):
     """ Basic validation of script without any command-line options. """
-    assert 0 == check_call(script, subcommand, review_board_url), "expected zero return code"
+    assert 0 == check_call(script, subcommand, server.url), "expected zero return code"
 
 
 @pytest.mark.parametrize("script", scripts)
 @pytest.mark.parametrize("subcommand", subcommands)
-def test_script_subcommand_with_options(script, subcommand, review_board_url):
+def test_script_subcommand_with_options(script, subcommand, server):
     """ Basic validation of script with unsupported command-line option. """
-    assert 0 != check_call(script, subcommand, review_board_url, '--foo=bar'), "expected non-zero return code"
+    assert 0 != check_call(script, subcommand, server.url, '--foo=bar'), "expected non-zero return code"
 
 
 review_request_parameters = [
@@ -72,18 +72,35 @@ review_request_parameters = [
 
 @pytest.mark.parametrize("script", scripts)
 @pytest.mark.parametrize("parameter", review_request_parameters)
-def test_review_requests_with_count_one_option(script, parameter, review_board_url):
+def test_review_requests_with_count_one_option(script, parameter, server):
     """ Basic validation of script with one command-line option. """
-    assert 0 == check_call(script, 'review-requests', review_board_url, parameter), "expected zero return code"
-    output = json.loads(check_output(script, 'review-requests', review_board_url, parameter))
+    assert 0 == check_call(script, 'review-requests', server.url, parameter), "expected zero return code"
+    output = json.loads(check_output(script, 'review-requests', server.url, parameter))
     assert 'ok' == output['stat']
 
 
 @pytest.mark.parametrize("script", scripts)
 @pytest.mark.parametrize("p1", review_request_parameters)
 @pytest.mark.parametrize("p2", review_request_parameters)
-def test_review_requests_with_count_only_option(script, p1, p2, review_board_url):
+def test_review_requests_with_count_only_option(script, p1, p2, server):
     """ Basic validation of script with multiple command-line options. """
-    assert 0 == check_call(script, 'review-requests', review_board_url, p1, p2), "expected zero return code"
-    output = json.loads(check_output(script, 'review-requests', review_board_url, p1, p2))
+    assert 0 == check_call(script, 'review-requests', server.url, p1, p2), "expected zero return code"
+    output = json.loads(check_output(script, 'review-requests', server.url, p1, p2))
     assert 'ok' == output['stat']
+
+
+post_parameters = [
+    './test_text_file',
+]
+
+
+@pytest.mark.parametrize("script", scripts)
+@pytest.mark.parametrize("parameter", post_parameters)
+def test_post_with_file_upload(credentials, script, server, parameter):
+    """ Validate the post subcommand. """
+    if(False == server.can_authenticate()):
+        pytest.skip("cannot authenticate to server: {}".format(server.fqdn))
+    assert 0 == check_call(script, 'post', '--username=' +
+            credentials['username'], '--password=' + credentials['password'], server.url, parameter), "expected zero return code"
+    output =  check_output(script, 'post', '--username=' + credentials['username'],
+            '--password=' + credentials['password'], server.url, parameter)

@@ -25,28 +25,69 @@
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
 from rbtlib import Links, Root
+import re
 import requests
 import pytest
 
 
-@pytest.fixture
-def review_board_fqdn():
-    return 'reviews.reviewboard.org'
+class ReviewBoardServer(object):
+    """ Parameters common to Review Board servers used by the test suite.
+    """
+    def __init__(self, scheme, fqdn):
+        self._fqdn = fqdn
+        self._scheme = scheme
+    @property
+    def fqdn(self):
+        return self._fqdn
+    @property
+    def scheme(self):
+        return self._scheme
+    @property
+    def url(self):
+        return self._scheme + '://' + self._fqdn
+    def can_authenticate(self):
+        return False
+
+
+class DemonstrationServer(ReviewBoardServer):
+    """ Server parameters for demo.reviewboard.org.
+    """
+    def __init__(self):
+        super(DemonstrationServer, self).__init__('http', 'demo.reviewboard.org')
+    def can_authenticate(self):
+        return True
+
+
+def pytest_generate_tests(metafunc):
+    """ Create parameterized tests for different server classes.
+    """
+    if 'server' in metafunc.fixturenames:
+        metafunc.parametrize("server", ['production', 'demonstration'], indirect=True)
 
 
 @pytest.fixture
-def review_board_url(review_board_fqdn):
-    return 'https://' + review_board_fqdn + '/api/'
+def server(request):
+    """ Return the server based upon the server class in the request.
+    """
+    if 'production' == request.param:
+        return ReviewBoardServer('https', 'reviews.reviewboard.org')
+    if 'demonstration' == request.param:
+        return DemonstrationServer()
+    raise ValueError("invalid internal test config")
 
 
 @pytest.fixture
 def session():
+    """ Return the HTTP session.
+    """
     return requests.Session()
 
 
 @pytest.fixture
-def root(session, review_board_url):
-    return Root(session, review_board_url)
+def root(session, server):
+    """ Construct a Root List Resource object.
+    """
+    return Root(session, server.url)
 
 
 @pytest.fixture
@@ -54,3 +95,20 @@ def links(root):
     """ Construct the Links object.
     """
     return Links(root, 'review_requests', 'application/vnd.reviewboard.org.review-requests+json')
+
+
+# Regular expression for the user credentials on demo.reviewboard.org login page.
+regex = re.compile('<p>To log into the demo server, use username &quot;(\w+)&quot;, password &quot;(\w+)&quot;</p>')
+
+
+@pytest.fixture
+def credentials(session, server):
+    """ Return the user credentials.
+    """
+    URL = server.url + '/account/login/'
+    r = session.get(URL)
+    assert 200 == r.status_code
+    credentials = regex.findall(r.text.encode('utf-8'))
+    if 0 == len(credentials):
+        return { 'username': None, 'password': None }
+    return { 'username': credentials[0][0], 'password': credentials[0][1] }
