@@ -65,4 +65,4 @@ uninstall: clean
 EXCLUDES= "venv/*"
 metrics:
 	radon cc -e ${EXCLUDES} -as .
-	xenon --max-absolute B --max-modules A --max-average A -e ${EXCLUDES} .
+	xenon --max-absolute C --max-modules A --max-average A -e ${EXCLUDES} .

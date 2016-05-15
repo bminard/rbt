@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
 # rbt: root.py
 #
-# Get the Root Resource from a Review Board instance.
+# Get the Root List Resource from a Review Board instance.
 #-------------------------------------------------------------------------------
 # The MIT License (MIT)
 # Copyright (c) 2016 Brian Minard
@@ -24,30 +24,20 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
-from resource import Resource
+import collections
+from resource import ResourceFactory
 
 
-class Root(Resource):
+class Root(ResourceFactory):
     """ The Root List Resource for the Review Board instance.
+
+    A helper class, requiring the fully-qualified domain name and URI scheme
+    used by the Review Board instance to query. The caller needn't specify the
+    entire URL to the Root List Resource.
+
+    Other Web API resources should rely upon the parent class.
     """
     name = 'root'
-    content_type = 'application/vnd.reviewboard.org.root+json'
     def __init__(self, session, url):
-        """ Contruct a Root List Resource.
-        """
-        super(Root, self).__init__(session, self.name, self.content_type)
-        self._session = session
-        self._url = url + '/api/'
-    def fetch(self, query_dict = None):
-        """ Getter for the Root List Resource.
-        """
-        return self._session.get(self._url, params = query_dict).json()
-    def get(self, query_dict = None):
-        """ Getter for the Root List Resource.
-        """
-        return self.composite(query_dict)
-    @property
-    def session(self):
-        """ Return the HTTP session.
-        """
-        return self._session
+        """ Construct a Root List Resource. """
+        super(Root, self).__init__(session, self.name, url + '/api/', 'GET')

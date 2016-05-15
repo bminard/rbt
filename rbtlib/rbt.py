@@ -28,9 +28,9 @@ import click
 import json
 import magic
 import requests
-from review_requests import ReviewRequests
 from root import Root
 import sys
+import user
 from urlparse import urlparse
 
 
@@ -53,7 +53,7 @@ def canonify_url(ctx, url):
 def beautify(resource, query_dict = None):
     """ Beautify response.
     """
-    return json.dumps(resource.get(query_dict).json, sort_keys = True, indent = 2)
+    return json.dumps(resource.json, sort_keys = True, indent = 2)
 
 
 def login(ctx, url, username, password):
@@ -61,16 +61,10 @@ def login(ctx, url, username, password):
 
     Returns HTTP status code, not an indicator of a successful login.
     """
-    URL = url + '/account/login/'
-    r = ctx.obj['session'].get(URL)
-    if 200 == r.status_code:
-        login_data  =  dict(username = username, password = password,
-            csrfmiddlewaretoken = ctx.obj['session'].cookies['csrftoken'], next = '/')
-        r = ctx.obj['session'].post(URL, data = login_data, headers = dict(Referer = URL))
-    return r.status_code
+    return user.login(ctx.obj['session'], url, username, password)
 
 
-def url_argument(f):
+def url(f):
     """ Apply the URL argument to each command in the group.
     """
     def callback(ctx, param, url):
@@ -87,12 +81,12 @@ def rbt(ctx):
 
 
 @rbt.command()
-@url_argument
+@url
 @click.pass_context
 def root(ctx, url):
     """ Show root resource.
     """
-    print beautify(Root(ctx.obj['session'], url))
+    print beautify(Root(ctx.obj['session'], url)())
     sys.exit
 
 
@@ -103,7 +97,7 @@ def root(ctx, url):
     help='Earliest date/time the review request is added.')
 @click.option('--time-added-to',
     help='Latest date/time the review request is added.')
-@url_argument
+@url
 @click.pass_context
 def review_requests(ctx, url, counts_only, time_added_from, time_added_to):
     """ Show review requests resource.
@@ -119,11 +113,11 @@ def review_requests(ctx, url, counts_only, time_added_from, time_added_to):
         query_dict['time-added-from'] = time_added_from
     if time_added_to:
         query_dict['time-added-to'] = time_added_to
-    print beautify(ReviewRequests(Root(ctx.obj['session'], url)), query_dict)
+    print beautify(Root(ctx.obj['session'], url)().review_requests(query_dict))
     sys.exit
 
 
-def file_argument(f):
+def file_name(f):
     """ Get the file name to post to Review Board.
     """
     def callback(ctx, param, file_name):
@@ -135,17 +129,21 @@ def file_argument(f):
 @click.pass_context
 @click.option('--username', prompt=True)
 @click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True)
-@url_argument
-@file_argument
+@url
+@file_name
 def post(ctx, url, file_name, username, password):
     """ Post file to Review Board.
     """
-    review_requests = ReviewRequests(Root(ctx.obj['session'], url)).get()
+    review_requests = Root(ctx.obj['session'], url)().review_requests()
     if 200 == login(ctx, url, username, password):
-        response =  review_requests.links.create.post({
+        create = review_requests.create({
             'file': (file_name, open(file_name, 'rb'),
-                magic.from_file(file_name, mime = True), {'Expires': '0'})
-            })
+            magic.from_file(file_name, mime = True), {'Expires': '0'})
+        })
+        if 'ok' == create.stat:
+            print >> sys.stderr, 'posted review {0}'.format(create.review_request.id)
+        else:
+            print >> sys.stderr, 'failed to post review'
     else:
-        print sys.stderr, 'failed to login'
+        print >> sys.stderr, 'failed to login'
     sys.exit

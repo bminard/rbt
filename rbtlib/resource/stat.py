@@ -31,7 +31,7 @@ def is_valid(fetch):
     """ Check response status from Review Board instance.
     """
     @wraps(fetch)
-    def _is_valid(url, query_dict = None):
+    def _is_valid(self, url, query_dict = None):
         """ Check the stat returned by the Review Board instance.
 
         URL is the fully qualified domain name, including the scheme, of the Review Board
@@ -39,7 +39,7 @@ def is_valid(fetch):
 
         query_dict are parameters passed with the URL.
         """
-        response = fetch(url, query_dict)
+        response = fetch(self, url, query_dict)
         assert 'ok' == response.stat or 'fail' == response.stat
         return response
     return _is_valid

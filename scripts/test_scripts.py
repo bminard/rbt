@@ -98,7 +98,7 @@ post_parameters = [
 @pytest.mark.parametrize("parameter", post_parameters)
 def test_post_with_file_upload(credentials, script, server, parameter):
     """ Validate the post subcommand. """
-    if(False == server.can_authenticate()):
+    if False == server.can_authenticate():
         pytest.skip("cannot authenticate to server: {}".format(server.fqdn))
     assert 0 == check_call(script, 'post', '--username=' +
             credentials['username'], '--password=' + credentials['password'], server.url, parameter), "expected zero return code"

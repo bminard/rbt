@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
-# rbt: test_links.py
+# rbt: user.py
 #
-# Tests for links.py.
+# User management.
 #-------------------------------------------------------------------------------
 # The MIT License (MIT)
 # Copyright (c) 2016 Brian Minard
@@ -24,16 +24,17 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
-import pytest
-from root import Root
-from types import DictType, ListType
 
 
-query_dicts = [ None, { 'counts-only': 'True' } ]
+def login(session, url, username, password):
+    """ User login.
 
-
-@pytest.mark.parametrize("query_dict", query_dicts)
-def test_fetch_through_links_with_query_dict(links, query_dict):
-    """ Handle case when link resource is present.
+    Returns HTTP status code, not an indicator of a successful login.
     """
-    assert type(links.fetch(query_dict)) == DictType
+    URL = url + '/account/login/'
+    r = session.get(URL)
+    if 200 == r.status_code:
+        login_data  =  dict(username = username, password = password,
+            csrfmiddlewaretoken = session.cookies['csrftoken'], next = '/')
+        r = session.post(URL, data = login_data, headers = dict(Referer = URL))
+    return r.status_code

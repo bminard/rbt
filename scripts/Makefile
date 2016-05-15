@@ -24,7 +24,7 @@
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
 check:
-	py.test
+	py.test $(wildcard test_*.py)
 
 
 clean:

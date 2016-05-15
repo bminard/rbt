@@ -24,10 +24,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
-from rbtlib import Links, Root
+import pytest
+from rbtlib import Root, user
 import re
 import requests
-import pytest
 
 
 class ReviewBoardServer(object):
@@ -83,18 +83,39 @@ def session():
     return requests.Session()
 
 
-@pytest.fixture
-def root(session, server):
-    """ Construct a Root List Resource object.
-    """
-    return Root(session, server.url)
+# Root List Resource top-level components defined in the Web API.
+root_components = [ 'json', 'stat', 'links', 'site', 'capabilities',
+        'product', 'uri_templates', ]
 
 
-@pytest.fixture
-def links(root):
-    """ Construct the Links object.
-    """
-    return Links(root, 'review_requests', 'application/vnd.reviewboard.org.review-requests+json')
+@pytest.fixture(params = root_components)
+def root_resource_component(request):
+    """ Provide top-level Root List Resource components. """
+    return request.param
+
+
+# Root List Resource links defined in the Web API.
+root_links = [ 'default_reviewers', 'extensions', 'groups',
+    'hosting_service_accounts', 'hosting_services', 'info', 'repositories',
+    'review_requests', 'search', 'self', 'session', 'users', 'validation',
+    'webhooks', ]
+
+
+@pytest.fixture(params = root_links)
+def root_resource_link(request):
+    """ Provide top-level Root List Resource links. """
+    return request.param
+
+
+# Combine Root List Resource components and links.
+extended_root_components = list(root_components)
+extended_root_components.extend(root_links)
+
+
+@pytest.fixture(params = extended_root_components)
+def extended_root_resource(request):
+    """ Provide top-level Root List Resource components and links. """
+    return request.param
 
 
 # Regular expression for the user credentials on demo.reviewboard.org login page.
@@ -112,3 +133,10 @@ def credentials(session, server):
     if 0 == len(credentials):
         return { 'username': None, 'password': None }
     return { 'username': credentials[0][0], 'password': credentials[0][1] }
+
+@pytest.fixture
+def login(session, server, credentials):
+    if False == server.can_authenticate():
+        pytest.skip("cannot authenticate to server: {}".format(server.fqdn))
+    if 200 != user.login(session, server.url, credentials['username'], credentials['password']):
+        pytest.fail("cannot login to server: {}".format(server.fqdn))

@@ -55,7 +55,7 @@ Post a review::
 
     > rbt post reviews.reviewboard.org /path/to/patch
 
-Write your own clients using the **rbtlib** APIs.
+Write your own client using the **rbtlib** API.
 
 License
 -------
@@ -65,5 +65,5 @@ License
 Acknowledgements
 ----------------
 
-***rbt*** wouldn't exist if it weren't for the Review Board team's Web
+**rbt** wouldn't exist if it weren't for the Review Board team's Web
 API documentation.  It's well documented.  Thank you!

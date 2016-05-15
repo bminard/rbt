@@ -26,7 +26,9 @@
 #-------------------------------------------------------------------------------
 __all__ = [
     "Resource",
+    "ResourceFactory",
 ]
 
 
 from resource import Resource
+from resource import ResourceFactory

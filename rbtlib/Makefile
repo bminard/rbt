@@ -25,7 +25,7 @@
 #-------------------------------------------------------------------------------
 check:
 	make -C resource check
-	py.test
+	py.test $(wildcard test_*.py)
 
 
 clean:

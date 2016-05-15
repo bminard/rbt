@@ -25,12 +25,14 @@
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
 __all__ = [
-    "Links",
+    "user",
     "Resource",
+    "ResourceFactory",
     "Root",
 ]
 
 
-from links import Links
 from root import Root
-from root import Resource
+from resource import Resource
+from resource import ResourceFactory
+import user
