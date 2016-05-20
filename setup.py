@@ -27,6 +27,7 @@
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
 import os, sys
+from rbtlib import __version__
 
 
 try:
@@ -73,7 +74,7 @@ setup(
     maintainer = 'Brian Minard',
     url = 'https://github.com/bminard/rbt',
     name = 'rbtlib',
-    version = '0.3',
+    version = __version__,
     packages = [
         'rbtlib',
     ],

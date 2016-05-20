@@ -36,3 +36,6 @@ from root import Root
 from resource import Resource
 from resource import ResourceFactory
 import user
+
+
+__version__ = u'0.3.0'
