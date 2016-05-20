@@ -35,9 +35,16 @@ from urlparse import urlparse
 
 
 def canonify_url(ctx, url):
-    """ Create a canonical URL for consumption by the library.
+    """Create a canonical URL for consumption by the library.
 
-    If the URL is missing a scheme try HTTPS then HTTP.
+    Args:
+        ctx: RBT context.
+        url: URL to cannonify.
+
+    Returns:
+        The provided URL if it contains a scheme; if the URL is missing a
+        scheme generate one.  Try HTTPS then HTTP and include the supported
+        scheme with the returned URL.
     """
     url_components = urlparse(url)
     if 0 == len(url_components.scheme):
@@ -50,24 +57,55 @@ def canonify_url(ctx, url):
     return url
 
 
-def beautify(resource, query_dict = None):
-    """ Beautify response.
+def beautify(resource):
+    """Beautify response.
+
+    Args:
+        resource: ResourceFactory instance to beautify.
+
+    Returns:
+        A JSON dump of the ResourceFactory instance formatted for readability.
     """
     return json.dumps(resource.json, sort_keys = True, indent = 2)
 
 
 def login(ctx, url, username, password):
-    """ User login.
+    """User login.
 
-    Returns HTTP status code, not an indicator of a successful login.
+    Log in using the user name and password.
+
+    Args:
+        ctx: RBT context.
+        url: Review Board URL.
+        username: account user name.
+        password: account password.
+
+    Returns:
+        HTTP status code, not an indicator of a successful login.
     """
     return user.login(ctx.obj['session'], url, username, password)
 
 
 def url(f):
-    """ Apply the URL argument to each command in the group.
+    """Define the URL callback.
+
+    Args:
+        f: callback function.
+
+    Returns:
+        The URL callback.
     """
     def callback(ctx, param, url):
+        """Apply the URL argument to each command in the group.
+
+        Args:
+            ctx: RBT context.
+            param: don't know.
+            url: URL to cannonify.
+
+        Returns:
+            The canonified URL argument to the RBT command.
+        """
         return canonify_url(ctx, url)
     return click.argument('url', callback=callback)(f)
 
@@ -75,7 +113,12 @@ def url(f):
 @click.group()
 @click.pass_context
 def rbt(ctx):
-    """ Declare the command group.
+    """Declare the command group.
+
+    Ensures the same HTTP session is used by all RBT commands in this session.
+
+    Args:
+        ctx: RBT context.
     """
     ctx.obj['session'] = requests.Session()
 
@@ -84,7 +127,14 @@ def rbt(ctx):
 @url
 @click.pass_context
 def root(ctx, url):
-    """ Show root resource.
+    """Print the Root List Resource.
+
+    Args:
+        ctx: RBT context.
+        url: Review Board URL.
+
+    Returns:
+        Writes to standard output.
     """
     print beautify(Root(ctx.obj['session'], url)())
     sys.exit
@@ -100,11 +150,22 @@ def root(ctx, url):
 @url
 @click.pass_context
 def review_requests(ctx, url, counts_only, time_added_from, time_added_to):
-    """ Show review requests resource.
+    """Print the Review Requests List Resource.
 
     The date and time format is YYYY-MM-DD HH:MM:SS or
     {yyyy}-{mm}-{dd}T{HH}:{MM}:{SS} with an optional timezone appended as
     -{HH:MM}.
+
+    Args:
+        ctx: RBT context.
+        url: Review Board URL.
+        counts_only: set to True to obtain review request counts only; False
+            otherwise.
+        time_added_from: earliest date from which to select review requests.
+        time__added_to: latest date from which to select review requests.
+
+    Returns:
+        Writes to standard output.
     """
     query_dict = dict()
     if counts_only:
@@ -118,9 +179,25 @@ def review_requests(ctx, url, counts_only, time_added_from, time_added_to):
 
 
 def file_name(f):
-    """ Get the file name to post to Review Board.
+    """Define the file name callback.
+
+    Args:
+        f: callback function.
+
+    Returns:
+        The file_name argument to the RBT command.
     """
     def callback(ctx, param, file_name):
+        """Get the name of the file to post to Review Board.
+
+        Args:
+            ctx: RBT context.
+            param: don't know.
+            file_name: name of file.
+
+        Returns:
+            The file name to the command.
+        """
         return file_name
     return click.argument('file_name', callback=callback)(f)
 
@@ -132,7 +209,16 @@ def file_name(f):
 @url
 @file_name
 def post(ctx, url, file_name, username, password):
-    """ Post file to Review Board.
+    """Post file to Review Board.
+
+    Args:
+        ctx: RBT context.
+        url: Review Board URL.
+        username: Review Board user name.
+        password: Review Board password.
+
+    Returns:
+        The file_name argument to the RBT command.
     """
     review_requests = Root(ctx.obj['session'], url)().review_requests()
     if 200 == login(ctx, url, username, password):

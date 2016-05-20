@@ -27,9 +27,16 @@
 
 
 def login(session, url, username, password):
-    """ User login.
+    """User login.
 
-    Returns HTTP status code, not an indicator of a successful login.
+    Args:
+        session: the HTTP session.
+        url: the Review Board URL.
+        username: account user name.
+        password: account password.
+
+    Returns:
+        The HTTP status code, not an indicator of a successful login.
     """
     URL = url + '/account/login/'
     r = session.get(URL)

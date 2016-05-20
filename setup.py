@@ -83,6 +83,9 @@ setup(
         'requests',
     ],
     extras_require = {
+        'docs': [
+            'Sphinx',
+        ],
         'test': [
             'pytest',
             'radon',

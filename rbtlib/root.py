@@ -29,15 +29,20 @@ from resource import ResourceFactory
 
 
 class Root(ResourceFactory):
-    """ The Root List Resource for the Review Board instance.
+    """The Root List Resource for the Review Board instance.
 
     A helper class, requiring the fully-qualified domain name and URI scheme
     used by the Review Board instance to query. The caller needn't specify the
     entire URL to the Root List Resource.
 
     Other Web API resources should rely upon the parent class.
+
+    Attributes:
+        session: the HTTP session.
+        url: the URL defining the resource location.
+        name: the resource name.
     """
     name = 'root'
     def __init__(self, session, url):
-        """ Construct a Root List Resource. """
+        """Construct a Root List Resource."""
         super(Root, self).__init__(session, self.name, url + '/api/', 'GET')

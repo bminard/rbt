@@ -34,7 +34,17 @@ subcommands = [ 'root', 'review-requests' ]
 
 
 def check_call(*args):
-    """ Verify script return code. """
+    """Verify script return code.
+
+    Args:
+        args: rbt command-line arguments
+
+    Returns:
+        RBT return code.
+
+    Raises:
+        CalledProcessError: whenever the subprocess cannot be properly envoked.
+    """
     try:
         return subprocess.check_call(list(args))
     except subprocess.CalledProcessError as e:
@@ -42,7 +52,17 @@ def check_call(*args):
 
 
 def check_output(*args):
-    """ Verify script text ouput. """
+    """Verify script text output.
+
+    Args:
+        args: rbt command-line arguments
+
+    Returns:
+        RBT return code.
+
+    Raises:
+        CalledProcessError: whenever the subprocess cannot be properly envoked.
+    """
     try:
         return subprocess.check_output(list(args))
     except subprocess.CalledProcessError as e:
@@ -52,14 +72,14 @@ def check_output(*args):
 @pytest.mark.parametrize("script", scripts)
 @pytest.mark.parametrize("subcommand", subcommands)
 def test_script_subcommand_no_options(script, subcommand, server):
-    """ Basic validation of script without any command-line options. """
+    """Basic validation of script without any command-line options."""
     assert 0 == check_call(script, subcommand, server.url), "expected zero return code"
 
 
 @pytest.mark.parametrize("script", scripts)
 @pytest.mark.parametrize("subcommand", subcommands)
 def test_script_subcommand_with_options(script, subcommand, server):
-    """ Basic validation of script with unsupported command-line option. """
+    """Basic validation of script with unsupported command-line option."""
     assert 0 != check_call(script, subcommand, server.url, '--foo=bar'), "expected non-zero return code"
 
 
@@ -73,7 +93,7 @@ review_request_parameters = [
 @pytest.mark.parametrize("script", scripts)
 @pytest.mark.parametrize("parameter", review_request_parameters)
 def test_review_requests_with_count_one_option(script, parameter, server):
-    """ Basic validation of script with one command-line option. """
+    """Basic validation of script with one command-line option."""
     assert 0 == check_call(script, 'review-requests', server.url, parameter), "expected zero return code"
     output = json.loads(check_output(script, 'review-requests', server.url, parameter))
     assert 'ok' == output['stat']
@@ -83,7 +103,7 @@ def test_review_requests_with_count_one_option(script, parameter, server):
 @pytest.mark.parametrize("p1", review_request_parameters)
 @pytest.mark.parametrize("p2", review_request_parameters)
 def test_review_requests_with_count_only_option(script, p1, p2, server):
-    """ Basic validation of script with multiple command-line options. """
+    """Basic validation of script with multiple command-line options."""
     assert 0 == check_call(script, 'review-requests', server.url, p1, p2), "expected zero return code"
     output = json.loads(check_output(script, 'review-requests', server.url, p1, p2))
     assert 'ok' == output['stat']
@@ -97,7 +117,7 @@ post_parameters = [
 @pytest.mark.parametrize("script", scripts)
 @pytest.mark.parametrize("parameter", post_parameters)
 def test_post_with_file_upload(credentials, script, server, parameter):
-    """ Validate the post subcommand. """
+    """Validate the post subcommand."""
     if False == server.can_authenticate():
         pytest.skip("cannot authenticate to server: {}".format(server.fqdn))
     assert 0 == check_call(script, 'post', '--username=' +

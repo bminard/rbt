@@ -33,7 +33,13 @@ import requests
 
 @pytest.fixture
 def context(session):
-    """ Mock-up of the Click context.
+    """Mock-up of the Click context.
+
+    Args:
+        session: the HTTP session.
+
+    Returns:
+        A mock-up of the Click context.
     """
     args = dict()
     obj = dict()
@@ -44,40 +50,36 @@ def context(session):
 
 
 def test_canonify_scheme_with_fixup(context, server):
-    """ Ensure that URLs are fixed up when they need to be.
-    """
+    """Ensure that URLs are fixed up when they need to be."""
     assert server.url == rbt.canonify_url(context, server.fqdn)
 
 
 def test_canonify_scheme_without_fixup(context, server):
-    """ Ensure that URLs are not fixed up when they don't need to be.
-    """
+    """Ensure that URLs are not fixed up when they don't need to be."""
     assert server.url == rbt.canonify_url(context, server.url)
 
 
 def test_login_ok(context, server, credentials):
-    """ Ensure we can login.
-    """
+    """Ensure we can login."""
     if(False == server.can_authenticate()):
         pytest.skip("cannot authenticate to server: {}".format(server.fqdn))
     assert 200 ==  rbt.login(context, server.url, credentials['username'], credentials['password'])
 
 
 def test_login_fail(context, server):
-    """ Ensure we can login.
-    """
+    """Ensure we can't login."""
     assert 200 ==  rbt.login(context, server.url, 'username', 'password')
 
 
 def test_rbt_with_fqdn_only(context, server):
-    """ Run rbt by specifing only a fully qualified domain name.
-    """
+    """Run rbt by specifing only a fully qualified domain name."""
     runner = CliRunner()
     result = runner.invoke(rbt.rbt, args = [ server.fqdn ])
     assert 0 < len(result.output)
     assert 0 != result.exit_code
 
 
+# RBT subcommand and arguments.
 subcommand_list = [
     [ 'root' ],
     [ 'review-requests' ],
@@ -87,8 +89,7 @@ subcommand_list = [
 
 @pytest.mark.parametrize("subcommand", subcommand_list)
 def test_rbt_with_subcommand_url_correct_position(context, subcommand, server):
-    """ Run rbt by specifing a subcommand and URL in the correct order.
-    """
+    """Run rbt by specifing a subcommand and URL in the correct order."""
     runner = CliRunner()
     result = runner.invoke(rbt.rbt, args = [ subcommand[0], server.fqdn ].extend(subcommand[1:]), obj = dict())
     assert 0 < len(result.output)
@@ -97,8 +98,7 @@ def test_rbt_with_subcommand_url_correct_position(context, subcommand, server):
 
 @pytest.mark.parametrize("subcommand", subcommand_list)
 def test_rbt_with_subcommand_url_wrong_position(context, subcommand, server):
-    """ Run rbt by specifing a subcommand and URL in the wrong order.
-    """
+    """Run rbt by specifing a subcommand and URL in the wrong order."""
     runner = CliRunner()
     if 1 < len(subcommand):
         args = [ server.fqdn ]

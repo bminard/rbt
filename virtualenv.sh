@@ -25,13 +25,15 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
-readonly EXTRAS_REQUIRED=${1};shift
+readonly EXTRAS_REQUIRED=${*}; shift
 
 virtualenv venv
 . venv/bin/activate
 pip install --upgrade pip
 if [ -n "${EXTRAS_REQUIRED}" ]; then
-	pip install -e .[${EXTRAS_REQUIRED}]
+	for package in `echo ${EXTRAS_REQUIRED} | tr " " "\n"`; do
+		pip install -e .[${package}]
+        done
 else
 	pip install -e .
 fi

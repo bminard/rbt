@@ -23,19 +23,26 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
-all: check
+all: check docs
 
 
+.PHONY: check
 check: metrics
 	make -C rbtlib check
 	make -C scripts check
 
 
+.PHONY: clean
 clean:
+	make -C docs clean
 	make -C rbtlib clean
 	make -C scripts clean
-	-/bin/rm -fr venv rbtlib.egg-info timestamp build dist .cache *.pyc
+	-/bin/rm -fr build dist .cache *.pyc
 
+
+.PHONY: docs
+docs:
+	make -C docs html
 
 .PHONY: install
 install: virtual-environment
@@ -48,7 +55,7 @@ virtual-environment: timestamp
 timestamp: venv
 	touch $@
 venv: virtualenv.sh requirements.txt
-	sh virtualenv.sh test
+	sh virtualenv.sh docs test
 	@echo ""
 	@echo "****************************************************************************"
 	@echo "* Run . venv/bin/activate to activate the virtual development environment! *"
@@ -60,9 +67,11 @@ venv: virtualenv.sh requirements.txt
 uninstall: clean
 	make -C rbtlib uninstall
 	make -C scripts uninstall
+	-/bin/rm -fr venv rbtlib.egg-info timestamp
 
 
 EXCLUDES= "venv/*"
+.PHONY: metrics
 metrics:
 	radon cc -e ${EXCLUDES} -as .
 	xenon --max-absolute C --max-modules A --max-average A -e ${EXCLUDES} .

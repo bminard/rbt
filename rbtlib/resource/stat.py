@@ -28,16 +28,24 @@ from functools import wraps
 
 
 def is_valid(fetch):
-    """ Check response status from Review Board instance.
+    """Decorator to validate the Review Board response status.
+
+    Args:
+        fetch: an HTTP command to execute.
+
+    Returns:
+        A function object capable of ensuring the response is valid.
     """
     @wraps(fetch)
     def _is_valid(self, url, query_dict = None):
-        """ Check the stat returned by the Review Board instance.
+        """Check the stat returned by Review Board.
 
-        URL is the fully qualified domain name, including the scheme, of the Review Board
-        instance to query.
+        Args:
+            href: A hypertext reference used by the HTTP command.
+            query_dict: A dictionary containing HTTP command parameters.
 
-        query_dict are parameters passed with the URL.
+        Returns:
+            The Review Board response.
         """
         response = fetch(self, url, query_dict)
         assert 'ok' == response.stat or 'fail' == response.stat

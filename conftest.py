@@ -31,44 +31,58 @@ import requests
 
 
 class ReviewBoardServer(object):
-    """ Parameters common to Review Board servers used by the test suite.
+    """Parameters common to Review Board servers used by the test suite.
+
+    Attributes:
+        scheme: URL scheme.
+        fqdn: Fully qualified domain name.
     """
+
     def __init__(self, scheme, fqdn):
         self._fqdn = fqdn
         self._scheme = scheme
+
     @property
     def fqdn(self):
         return self._fqdn
+
     @property
     def scheme(self):
         return self._scheme
+
     @property
     def url(self):
         return self._scheme + '://' + self._fqdn
+
     def can_authenticate(self):
+        """Determine if the these can authenticate to the server."""
         return False
 
 
 class DemonstrationServer(ReviewBoardServer):
-    """ Server parameters for demo.reviewboard.org.
+    """Server parameters for demo.reviewboard.org.
     """
+
     def __init__(self):
         super(DemonstrationServer, self).__init__('http', 'demo.reviewboard.org')
+
     def can_authenticate(self):
+        """Determine if the these can authenticate to the server.
+
+        Demo server authentication relies upon parsing the demo login page.
+        """
         return True
 
 
 def pytest_generate_tests(metafunc):
-    """ Create parameterized tests for different server classes.
-    """
+    """Create parameterized tests for different server classes."""
     if 'server' in metafunc.fixturenames:
         metafunc.parametrize("server", ['production', 'demonstration'], indirect=True)
 
 
 @pytest.fixture
 def server(request):
-    """ Return the server based upon the server class in the request.
-    """
+    """Return the server based upon the server class in the request."""
     if 'production' == request.param:
         return ReviewBoardServer('https', 'reviews.reviewboard.org')
     if 'demonstration' == request.param:
@@ -78,7 +92,10 @@ def server(request):
 
 @pytest.fixture
 def session():
-    """ Return the HTTP session.
+    """Return the HTTP session.
+
+    Correct operation of tests requiring authentication requires they use the
+    same HTTP session.
     """
     return requests.Session()
 
@@ -90,7 +107,7 @@ root_components = [ 'json', 'stat', 'links', 'site', 'capabilities',
 
 @pytest.fixture(params = root_components)
 def root_resource_component(request):
-    """ Provide top-level Root List Resource components. """
+    """Provide top-level Root List Resource components."""
     return request.param
 
 
@@ -103,7 +120,7 @@ root_links = [ 'default_reviewers', 'extensions', 'groups',
 
 @pytest.fixture(params = root_links)
 def root_resource_link(request):
-    """ Provide top-level Root List Resource links. """
+    """Provide top-level Root List Resource links."""
     return request.param
 
 
@@ -114,7 +131,7 @@ extended_root_components.extend(root_links)
 
 @pytest.fixture(params = extended_root_components)
 def extended_root_resource(request):
-    """ Provide top-level Root List Resource components and links. """
+    """Provide top-level Root List Resource components and links."""
     return request.param
 
 
@@ -124,7 +141,9 @@ regex = re.compile('<p>To log into the demo server, use username &quot;(\w+)&quo
 
 @pytest.fixture
 def credentials(session, server):
-    """ Return the user credentials.
+    """Return the user credentials.
+
+    Demo server authentication relies upon parsing the demo login page.
     """
     URL = server.url + '/account/login/'
     r = session.get(URL)
@@ -134,8 +153,10 @@ def credentials(session, server):
         return { 'username': None, 'password': None }
     return { 'username': credentials[0][0], 'password': credentials[0][1] }
 
+
 @pytest.fixture
 def login(session, server, credentials):
+    """Login to the specified server."""
     if False == server.can_authenticate():
         pytest.skip("cannot authenticate to server: {}".format(server.fqdn))
     if 200 != user.login(session, server.url, credentials['username'], credentials['password']):
