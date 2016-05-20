@@ -123,7 +123,7 @@ html_theme = 'alabaster'
 html_theme_options = {
     'show_powered_by': False,
     'github_user': 'bminard',
-    'github_repo': 'rbt',
+    'github_repo': 'rbtlib',
     'github_banner': True,
     'show_related': False
 }

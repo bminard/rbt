@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# rbt: setup.py
+# rbtlib: setup.py
 #
 # Rbt setup script.
 #
@@ -72,7 +72,7 @@ setup(
     description = 'A client-side library for Review Board.',
     long_description = description,
     maintainer = 'Brian Minard',
-    url = 'https://github.com/bminard/rbt',
+    url = 'https://github.com/bminard/rbtlib',
     name = 'rbtlib',
     version = __version__,
     packages = [

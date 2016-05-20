@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# rbt: rbt.py
+# rbtlib: rbt.py
 #
 # Command-line interface for rbt.
 #

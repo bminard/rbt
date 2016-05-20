@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# rbt: rbt.py
+# rbtlib: rbt.py
 #
 # Entry point for command-line tool.
 #-------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ def canonify_url(ctx, url):
     """Create a canonical URL for consumption by the library.
 
     Args:
-        ctx: RBT context.
+        ctx: RBTLIB context.
         url: URL to cannonify.
 
     Returns:
@@ -75,7 +75,7 @@ def login(ctx, url, username, password):
     Log in using the user name and password.
 
     Args:
-        ctx: RBT context.
+        ctx: RBTLIB context.
         url: Review Board URL.
         username: account user name.
         password: account password.
@@ -99,7 +99,7 @@ def url(f):
         """Apply the URL argument to each command in the group.
 
         Args:
-            ctx: RBT context.
+            ctx: RBTLIB context.
             param: don't know.
             url: URL to cannonify.
 
@@ -118,7 +118,7 @@ def rbt(ctx):
     Ensures the same HTTP session is used by all RBT commands in this session.
 
     Args:
-        ctx: RBT context.
+        ctx: RBTLIB context.
     """
     ctx.obj['session'] = requests.Session()
 
@@ -130,7 +130,7 @@ def root(ctx, url):
     """Print the Root List Resource.
 
     Args:
-        ctx: RBT context.
+        ctx: RBTLIB context.
         url: Review Board URL.
 
     Returns:
@@ -157,7 +157,7 @@ def review_requests(ctx, url, counts_only, time_added_from, time_added_to):
     -{HH:MM}.
 
     Args:
-        ctx: RBT context.
+        ctx: RBTLIB context.
         url: Review Board URL.
         counts_only: set to True to obtain review request counts only; False
             otherwise.
@@ -191,7 +191,7 @@ def file_name(f):
         """Get the name of the file to post to Review Board.
 
         Args:
-            ctx: RBT context.
+            ctx: RBTLIB context.
             param: don't know.
             file_name: name of file.
 
@@ -212,7 +212,7 @@ def post(ctx, url, file_name, username, password):
     """Post file to Review Board.
 
     Args:
-        ctx: RBT context.
+        ctx: RBTLIB context.
         url: Review Board URL.
         username: Review Board user name.
         password: Review Board password.
