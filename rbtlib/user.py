@@ -38,6 +38,7 @@ def login(session, url, username, password):
     Returns:
         The HTTP status code, not an indicator of a successful login.
     """
+    # FIXME: should return an indication of sucessful or unsuccessful login
     URL = url + '/account/login/'
     r = session.get(URL)
     if 200 == r.status_code:
