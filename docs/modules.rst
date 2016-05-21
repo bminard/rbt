@@ -1,4 +1,4 @@
-RBTLIB: A client-side Library for Review Board
+RBTLIB: A Client-Side Library for Review Board
 ==============================================
 
 Resource Module

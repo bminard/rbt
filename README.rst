@@ -1,6 +1,14 @@
 What is RBTLIB?
 ---------------
 
+.. image:: https://travis-ci.org/bminard/rbtlib.svg?branch=master
+    :target: https://travis-ci.org/bminard/rbtlib
+    :alt: Travis CI Build Status
+
+.. image:: https://readthedocs.org/projects/rbtlib/badge/?version=latest
+    :target: http://rbtlib.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
 **rbtlib** is a client-side Python package for `Review Board`_.
 Use it to write your own Review Board clients.
 
@@ -8,8 +16,7 @@ Use it to write your own Review Board clients.
 Use it to collect the Root List and Review Requests List Resources.
 Limit Review Requests using **rbt** options snd post review requests.
 
-Documentation for **rbtlib** and **rbt** is available on `readthedocs.org`_:
-.. image:: https://readthedocs.org/projects/rbtlib/badge/?version=latest.
+Documentation for **rbtlib** and **rbt** is available on `readthedocs.org`_.
 
 Pre-requisites
 --------------

@@ -91,8 +91,8 @@ class Resource(object):
     - handling the HTTP response (e.g., content type and status code)
     - payload conversion to a whole-part hierarchy
 
-    The whole-part hierarchy is contained within a collection of nested named
-    tuples that exactly reflect the response returned by Review Board.
+    The whole-part hierarchy is contained a nested named tuple containing the
+    response returned by Review Board.
 
     The composite contains a copy of the JSON response from Review Board. This
     permits clients to access the response using a named tuple or dictionary.

@@ -69,7 +69,7 @@ setup(
     author = "Brian Minard",
     author_email = "bminard@flatfoot.ca",
     license = "MIT",
-    description = 'A client-side library for Review Board.',
+    description = 'A Client-Side library for Review Board.',
     long_description = description,
     maintainer = 'Brian Minard',
     url = 'https://github.com/bminard/rbtlib',
