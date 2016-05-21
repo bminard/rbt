@@ -52,7 +52,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'RBTLIB: A Client-Side library for Review Board'
+project = u'RBTLIB: A Client-Side Library for Review Board'
 copyright = u'2016, Brian Minard'
 author = u'Brian Minard'
 

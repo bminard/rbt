@@ -58,17 +58,46 @@ arguments or with ``--help`` prints a detailed usage message.
 Run::
 
     > rbt review-requests reviews.reviewboard.org --counts-only
+    {
+      "count": 144,
+      "stat": "ok"
+    }
 
 to get a count of reviews.
 Or::
 
     > rbt review-requests reviews.reviewboard.org --time-added-from 2016-02-27
+    {
+      "links": {
+        "create": {
+          "href": "https://reviews.reviewboard.org/api/review-requests/",
+          "method": "POST"
+        },
+        "next": {
+          "href": "https://reviews.reviewboard.org/api/review-requests/?start=25&max-results=25&time-added-from=2016-02-27",
+          "method": "GET"
+        },
+        "self": {
+          "href": "https://reviews.reviewboard.org/api/review-requests/?time-added-from=2016-02-27",
+          "method": "GET"
+        }
+      },
+      "review_requests": [
+        ...
+      ],
+      "stat": "ok",
+      "total_results": 32
+    }
 
 to get a list of reviews from the specified date.
 
 Post a review::
 
-    > rbt post reviews.reviewboard.org /path/to/patch
+    > rbt post demo.reviewboard.org /path/to/patch
+    Username: guest6894
+    Password: ****
+    Repeat for confirmation: ****
+    posted review 1755
 
 Write your own client using the **rbtlib** API.
 
