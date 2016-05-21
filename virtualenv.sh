@@ -27,13 +27,19 @@
 #-------------------------------------------------------------------------------
 readonly EXTRAS_REQUIRED=${*}; shift
 
-virtualenv venv
-. venv/bin/activate
+
+python -c 'import sys; print sys.real_prefix' 2>/dev/null > /dev/null
+if [ $? -ne 0 ]; then
+	echo "$0: run me in a virtualenv."
+	exit 1
+fi
+
+
 pip install --upgrade pip
 if [ -n "${EXTRAS_REQUIRED}" ]; then
 	for package in `echo ${EXTRAS_REQUIRED} | tr " " "\n"`; do
 		pip install -e .[${package}]
-        done
+	done
 else
 	pip install -e .
 fi

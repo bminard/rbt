@@ -18,7 +18,7 @@ Be consistent with existing code.
 Virtual Environment
 +++++++++++++++++++
 
-The top-level :file:`Makefile` provides support for virtual environments.
+The top-level :file:`Makefile` can populate a virtual environment.
 See :file:`virtualenv.sh`.
 
 Requires `virtualenv`_.

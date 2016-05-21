@@ -1,3 +1,4 @@
+recursive-include docs *.py *.rst
 recursive-include rbtlib *.py 
 recursive-include scripts *.py rbt
 include README.rst

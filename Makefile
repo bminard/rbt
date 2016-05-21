@@ -51,27 +51,18 @@ install: virtual-environment
 
 
 .PHONY: virtual-environment
-virtual-environment: timestamp
-timestamp: venv
-	touch $@
-venv: virtualenv.sh requirements.txt
+virtual-environment: virtualenv.sh requirements.txt
 	sh virtualenv.sh docs test
-	@echo ""
-	@echo "****************************************************************************"
-	@echo "* Run . venv/bin/activate to activate the virtual development environment! *"
-	@echo "****************************************************************************"
-	@echo ""
 
 
 .PHONY: uninstall
 uninstall: clean
 	make -C rbtlib uninstall
 	make -C scripts uninstall
-	-/bin/rm -fr venv rbtlib.egg-info timestamp
+	-/bin/rm -fr rbtlib.egg-info
 
 
-EXCLUDES= "venv/*"
 .PHONY: metrics
 metrics:
-	radon cc -e ${EXCLUDES} -as .
-	xenon --max-absolute C --max-modules A --max-average A -e ${EXCLUDES} .
+	radon cc -as .
+	xenon --max-absolute C --max-modules A --max-average A .

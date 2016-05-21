@@ -41,14 +41,14 @@ def resource(session):
 
 
 def test_resource_getter_bad_content_type(server, resource):
-    """Execute getter on bad content."""
+    """Execute HTTP GET on bad content."""
     with pytest.raises(BadContentType):
         resource.get(server.url)
 
 
 @pytest.fixture
 def server_response(server, resource):
-    """Execute getter on valid content.
+    """Execute HTTP GET on valid content.
 
     Args:
         server: Review Board server.
@@ -60,8 +60,14 @@ def server_response(server, resource):
     return resource.get(server.url + '/api/')
 
 
+def test_resource_post_bad_content_type(server, resource):
+    """Execute HTTP POST on bad content."""
+    with pytest.raises(BadContentType):
+        resource.post(server.url)
+
+
 def test_resource_getter_attribute_error(server_response):
-    """Execute getter on non-existent link."""
+    """Execute HTTP GET on non-existent link."""
     with pytest.raises(AttributeError):
         server_response.foo
 
