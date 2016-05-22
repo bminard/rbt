@@ -1,5 +1,4 @@
 What is RBTLIB?
----------------
 
 .. image:: https://travis-ci.org/bminard/rbtlib.svg?branch=master
     :target: https://travis-ci.org/bminard/rbtlib
@@ -8,6 +7,7 @@ What is RBTLIB?
 .. image:: https://readthedocs.org/projects/rbtlib/badge/?version=latest
     :target: http://rbtlib.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+---------------
 
 **rbtlib** is a client-side Python package for `Review Board`_.
 Use it to write your own Review Board clients.

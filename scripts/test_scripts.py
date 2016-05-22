@@ -25,11 +25,15 @@
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
 import json
+import os
+import pkg_resources
 import pytest
 import subprocess
+import sys
 
 
-scripts = [ './rbt', './rbt.py' ]
+scripts = [ pkg_resources.resource_filename(__name__, "rbt"),
+        pkg_resources.resource_filename(__name__, "rbt.py") ]
 subcommands = [ 'root', 'review-requests' ]
 
 
@@ -110,7 +114,7 @@ def test_review_requests_with_count_only_option(script, p1, p2, server):
 
 
 post_parameters = [
-    './test_text_file',
+     pkg_resources.resource_filename(__name__, "test_text_file")
 ]
 
 

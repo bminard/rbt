@@ -1,3 +1,7 @@
 Click
+Sphinx
 pytest
+python-magic
+radon
 requests
+xenon

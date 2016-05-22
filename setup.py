@@ -82,11 +82,9 @@ setup(
         'Click',
         'python-magic',
         'requests',
+        'Sphinx',
     ],
     extras_require = {
-        'docs': [
-            'Sphinx',
-        ],
         'test': [
             'pytest',
             'radon',

@@ -52,7 +52,7 @@ install: virtual-environment
 
 .PHONY: virtual-environment
 virtual-environment: virtualenv.sh requirements.txt
-	sh virtualenv.sh docs test
+	sh virtualenv.sh test
 
 
 .PHONY: uninstall

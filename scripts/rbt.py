@@ -28,7 +28,7 @@
 # IN THE SOFTWARE.
 #-------------------------------------------------------------------------------
 import sys
-from rbtlib.rbt import rbt
+from rbtlib import rbt
 
 
 if __name__ == '__main__':
