@@ -51,20 +51,20 @@ def test_root_dict(root, query_dict):
 
 
 @pytest.mark.parametrize("query_dict", query_dicts)
-def test_root_named_tuple(root, query_dict):
-    """Confirm the stat in the named tuple component."""
+def test_root_namedtuple(root, query_dict):
+    """Confirm the stat in the namedtuple component."""
     assert 'ok' == root(query_dict).stat
 
 
 @pytest.mark.parametrize("query_dict", query_dicts)
-def test_root_dict_and_named_tuple_equivalence(root, query_dict):
-    """Confirm the stat in the JSON and named tuple are equal."""
+def test_root_dict_and_namedtuple_equivalence(root, query_dict):
+    """Confirm the stat in the JSON and namedtuple are equal."""
     assert root(query_dict).stat == root(query_dict).json['stat']
 
 
 @pytest.mark.parametrize("query_dict", query_dicts)
-def test_root_get_named_tuple(root, query_dict, root_resource_component):
-    """Confirm named tuple contains expected components."""
+def test_root_get_namedtuple(root, query_dict, root_resource_component):
+    """Confirm namedtuple contains expected components."""
     assert None != getattr(root(query_dict), root_resource_component, None)
 
 
@@ -77,7 +77,7 @@ def link_component(request):
 @pytest.mark.parametrize("query_dict", query_dicts)
 def test_linked_root_link_component(root, query_dict, root_resource_link,
         link_component):
-    """Confirm named tuple's links contains requisite components."""
+    """Confirm namedtuple's links contains requisite components."""
     assert None != getattr(getattr(getattr(root(query_dict), 'links', None),
         root_resource_link, None), link_component, None)
 

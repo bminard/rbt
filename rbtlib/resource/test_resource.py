@@ -40,6 +40,24 @@ def resource(session):
     return Resource(session, 'root')
 
 
+dict_types = [ dict(), { 'foo': 'bar' }, { } ]
+
+
+@pytest.mark.parametrize("dict_type", dict_types)
+def test_is_dict(resource, dict_type):
+    """Check if the dictionary types are detected correctly."""
+    assert True == resource.is_dict(dict_type)
+
+
+non_dict_types = [ 1, 'bar', list(), list('foo') ]
+
+
+@pytest.mark.parametrize("non_dict_type", non_dict_types)
+def test_is_not_dict(resource, non_dict_type):
+    """Check if the dictionary types are detected correctly."""
+    assert False == resource.is_dict(non_dict_type)
+
+
 def test_resource_getter_bad_content_type(server, resource):
     """Execute HTTP GET on bad content."""
     with pytest.raises(BadContentType):
@@ -77,8 +95,8 @@ def test_resource_get_dict(server_response):
     assert 'ok' == server_response.json['stat']
 
 
-def test_resource_get_dict_and_named_tuple_stat_equivalence(server_response):
-    """Confirm JSON dictionary and named tuple have the same stat value."""
+def test_resource_get_dict_and_namedtuple_stat_equivalence(server_response):
+    """Confirm JSON dictionary and namedtuple have the same stat value."""
     assert server_response.stat == server_response.json['stat']
 
 
@@ -114,28 +132,28 @@ def equivalent(lhs, rhs):
     return True
 
 
-def test_resource_get_dict_and_named_tuple_deep_equivalence(server_response):
-    """Confirm JSON dictionary and named tuple have the same content."""
+def test_resource_get_dict_and_namedtuple_deep_equivalence(server_response):
+    """Confirm JSON dictionary and namedtuple have the same content."""
     assert True == equivalent(server_response.json, server_response)
 
 
-def test_resource_get_named_tuple(server_response, root_resource_component):
-    """Confirm named tuple contains expected components."""
+def test_resource_get_namedtuple(server_response, root_resource_component):
+    """Confirm namedtuple contains expected components."""
     assert None != getattr(server_response, root_resource_component, None)
 
 
 def test_linked_resource(server_response, root_resource_link):
-    """Confirm named tuple contains expected linked components."""
+    """Confirm namedtuple contains expected linked components."""
     assert None != getattr(server_response.links, root_resource_link, None)
 
 
 def test_linked_resource_href(server_response, root_resource_link):
-    """Confirm named tuple linked components contain hypertext references."""
+    """Confirm namedtuple linked components contain hypertext references."""
     assert None != getattr(getattr(server_response.links,
         root_resource_link, None), 'href', None)
 
 
 def test_linked_resource_method(server_response, root_resource_link):
-    """Confirm named tuple linked components contain HTTP method definitions."""
+    """Confirm namedtuple linked components contain HTTP method definitions."""
     assert None != getattr(getattr(server_response.links,
         root_resource_link, None), 'method', None)
