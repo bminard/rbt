@@ -37,12 +37,16 @@ def login(session, url, username, password):
 
     Returns:
         The HTTP status code, not an indicator of a successful login.
+
+    Raises:
+        requests.exceptions.HTTPError: whenever an HTTP error occurs
     """
     # FIXME: should return an indication of sucessful or unsuccessful login
     URL = url + '/account/login/'
     r = session.get(URL)
-    if 200 == r.status_code:
-        login_data  =  dict(username = username, password = password,
-            csrfmiddlewaretoken = session.cookies['csrftoken'], next = '/')
-        r = session.post(URL, data = login_data, headers = dict(Referer = URL))
+    r.raise_for_status()
+    login_data  =  dict(username = username, password = password,
+        csrfmiddlewaretoken = session.cookies['csrftoken'], next = '/')
+    r = session.post(URL, data = login_data, headers = dict(Referer = URL))
+    r.raise_for_status()
     return r.status_code

@@ -221,18 +221,24 @@ def post(ctx, url, file_name, username, password):
         The file_name argument to the RBT command.
     """
     review_requests = Root(ctx.obj['session'], url)().review_requests()
-    if 200 == login(ctx, url, username, password):
-        create = review_requests.create()
-        if 'ok' == create.stat:
-            print >> sys.stderr, 'posted review {0}'.format(create.review_request.id)
-            print create._fields
-            print create.review_request._fields
-            update = create.review_request.update({
-                'file': (file_name, open(file_name, 'rb'),
-                magic.from_file(file_name, mime = True), {'Expires': '0'})
-            })
+    try:
+        status_code = login(ctx, url, username, password)
+        print status_code
+        if requests.codes.ok == status_code:
+            create = review_requests.create()
+            if 'ok' == create.stat:
+                print >> sys.stderr, 'posted review {0}'.format(create.review_request.id)
+                print create._fields
+                print create.review_request._fields
+                update = create.review_request.update({
+                    'file': (file_name, open(file_name, 'rb'),
+                    magic.from_file(file_name, mime = True), {'Expires': '0'})
+                    })
+            else:
+                print >> sys.stderr, 'failed to post review'
         else:
-            print >> sys.stderr, 'failed to post review'
-    else:
-        print >> sys.stderr, 'failed to login'
+            print >> sys.stderr, 'failed to login'
+    except requests.exceptions.HTTPError as e:
+        print e
+        raise
     sys.exit
