@@ -22,7 +22,11 @@ Pre-requisites
 --------------
 
 **rbtlib** and **rbt** require Python to run.
-See ``setup.py`` for dependencies.
+See ``requirements.txt`` for dependencies.
+
+To install Python dependencies Run::
+
+  pip install -r requirements.txt
 
 Installing
 ----------
